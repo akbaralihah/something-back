@@ -9,57 +9,12 @@ from fastapi import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
-from app.schemas.user import UserRead, UserLogin, UserCreate, UserListItem, UserUpdate
+from app.schemas.user import UserRead, UserListItem, UserUpdate
 from app.services.user import UserService
 from app.schemas.pagination import PaginatedResponse
 from app.core.limiter import limiter
 
 router = APIRouter(tags=["users"])
-
-
-@router.post(
-    path="/users/register",
-    response_model=UserRead,
-    status_code=status.HTTP_201_CREATED,
-    tags=["auth"],
-    summary="Registering a new user",
-)
-@limiter.limit("5/minute")
-async def register(
-    request: Request, body: UserCreate, db: AsyncSession = Depends(get_db)
-):
-    service = UserService(db)
-    user, created = await service.register(
-        first_name=body.first_name,
-        last_name=body.last_name,
-        username=body.username,
-        email=body.email,
-        password=body.password,
-    )
-    if not created:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="A user with this name already exists.",
-        )
-    return user
-
-
-@router.post(
-    "/users/login",
-    response_model=UserRead,
-    tags=["auth"],
-    summary="Login (authentication)",
-)
-@limiter.limit("10/minute")
-async def login(request: Request, body: UserLogin, db: AsyncSession = Depends(get_db)):
-    service = UserService(db)
-    user = await service.login(username=body.username, password=body.password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password.",
-        )
-    return user
 
 
 @router.get(

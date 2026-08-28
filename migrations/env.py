@@ -22,6 +22,7 @@ if config.config_file_name is not None:
 
 from app.db.base import Base
 from app.models.user import User, UserPhoto
+from app.models.phone_verification import PhoneVerification
 
 target_metadata = Base.metadata
 

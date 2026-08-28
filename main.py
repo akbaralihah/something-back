@@ -8,6 +8,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from app.core.limiter import limiter
+from app.api.auth import router as auth_router
 from app.api.user import router as user_router
 from app.api.user_photo import router as user_photo_router
 
@@ -16,6 +17,8 @@ app = FastAPI(title="Something API")
 origins = [
     "http://localhost",
     "http://localhost:8000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 os.makedirs("media/user_photos", exist_ok=True)
@@ -91,5 +94,6 @@ async def main(request: Request):
     """
 
 
+app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(user_photo_router)

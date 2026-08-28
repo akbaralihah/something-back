@@ -12,10 +12,16 @@ class User(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     first_name: Mapped[str] = mapped_column(String(100))
     last_name: Mapped[str] = mapped_column(String(100))
-    username: Mapped[str] = mapped_column(String(50), unique=True, index=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    phone_number: Mapped[str | None] = mapped_column(String(12), nullable=True)
-    password: Mapped[str] = mapped_column(String(255))
+    username: Mapped[str | None] = mapped_column(
+        String(50), unique=True, index=True, nullable=True
+    )
+    email: Mapped[str | None] = mapped_column(
+        String(255), unique=True, index=True, nullable=True
+    )
+    phone_number: Mapped[str] = mapped_column(
+        String(12), unique=True, index=True, nullable=False
+    )
+    password: Mapped[str | None] = mapped_column(String(255), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())

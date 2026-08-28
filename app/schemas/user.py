@@ -5,47 +5,13 @@ from typing import Optional
 from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
 
 
-class UserCreate(BaseModel):
-    first_name: str
-    last_name: str
-    username: str
-    email: EmailStr
-    password: str
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "first_name": "Akbarali",
-                "last_name": "Salohiddinov",
-                "username": "akbarali_hah",
-                "email": "akbarali4hah@gmail.com",
-                "password": "Salom123",
-            }
-        }
-    )
-
-
-class UserLogin(BaseModel):
-    username: str
-    password: str
-
-    model_config = ConfigDict(
-        json_schema_extra={
-            "example": {
-                "username": "akbarali_hah",
-                "password": "Salom123",
-            }
-        }
-    )
-
-
 class UserRead(BaseModel):
     id: int
     first_name: str
     last_name: str
-    username: str
-    email: EmailStr
-    phone_number: Optional[str]
+    username: Optional[str]
+    email: Optional[EmailStr]
+    phone_number: str
     is_active: bool
     is_superuser: bool
     created_at: datetime
@@ -72,8 +38,8 @@ class UserRead(BaseModel):
 
 class UserListItem(BaseModel):
     id: int
-    username: str
-    email: EmailStr
+    username: Optional[str]
+    email: Optional[EmailStr]
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
