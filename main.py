@@ -9,6 +9,7 @@ from slowapi.errors import RateLimitExceeded
 
 from app.core.limiter import limiter
 from app.api.auth import router as auth_router
+from app.api.chat import router as chat_router
 from app.api.user import router as user_router
 from app.api.user_photo import router as user_photo_router
 
@@ -95,5 +96,6 @@ async def main(request: Request):
 
 
 app.include_router(auth_router)
+app.include_router(chat_router)
 app.include_router(user_router)
 app.include_router(user_photo_router)
