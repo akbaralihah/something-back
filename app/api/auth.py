@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.deps import get_current_user
 from app.core.limiter import limiter
 from app.db.session import get_db
+from app.repositories.user_photo import UserPhotoRepository
 from app.schemas.auth import (
     AuthTokenResponse,
     CompleteProfileRequest,
@@ -14,8 +15,18 @@ from app.schemas.auth import (
 )
 from app.schemas.user import UserRead
 from app.services.auth import AuthService
+from app.utils.media import build_absolute_url
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+async def _build_user_read(request: Request, db: AsyncSession, user) -> UserRead:
+    last_photo = await UserPhotoRepository(db).get_last_by_user_id(user.id)
+    user_data = UserRead.model_validate(user)
+    user_data.photo_url = (
+        build_absolute_url(request, last_photo.photo_url) if last_photo else None
+    )
+    return user_data
 
 
 @router.post(
@@ -50,7 +61,7 @@ async def verify_code(
         is_new_user=is_new_user,
         phone_number=body.phone_number,
         access_token=token,
-        user=user,
+        user=await _build_user_read(request, db, user) if user else None,
     )
 
 
@@ -77,11 +88,15 @@ async def complete_profile(
         )
 
     user, token = result
-    return AuthTokenResponse(access_token=token, user=user)
+    return AuthTokenResponse(
+        access_token=token, user=await _build_user_read(request, db, user)
+    )
 
 
-@router.get(
-    "/me", response_model=UserRead, summary="Get current authenticated user"
-)
-async def get_me(current_user=Depends(get_current_user)):
-    return current_user
+@router.get("/me", response_model=UserRead, summary="Get current authenticated user")
+async def get_me(
+    request: Request,
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    return await _build_user_read(request, db, current_user)

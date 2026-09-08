@@ -14,6 +14,7 @@ class UserRead(BaseModel):
     phone_number: str
     is_active: bool
     is_superuser: bool
+    photo_url: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -29,6 +30,7 @@ class UserRead(BaseModel):
                 "phone_number": "998200158060",
                 "is_active": True,
                 "is_superuser": False,
+                "photo_url": "/media/user_photos/6f1b7c8e-....jpg",
                 "created_at": "2026-04-22T10:00:00",
                 "updated_at": "2026-04-22T10:00:00",
             }
