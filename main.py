@@ -1,6 +1,6 @@
 import os
 
-from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -12,6 +12,7 @@ from app.api.auth import router as auth_router
 from app.api.chat import router as chat_router
 from app.api.user import router as user_router
 from app.api.user_photo import router as user_photo_router
+from app.ws.chat import router as chat_ws_router
 
 app = FastAPI(title="Something API")
 
@@ -53,19 +54,6 @@ async def ignore_favicon(request: Request, call_next):
     return await call_next(request)
 
 
-@app.websocket("/ws")
-async def websocket_endpoint(ws: WebSocket):
-    await ws.accept()
-
-    try:
-        while True:
-            data = await ws.receive_json()
-            data["username"] = str(data["username"]).capitalize()
-            await ws.send_json(data)
-    except WebSocketDisconnect:
-        print("Client disconnected")
-
-
 @app.get("/", response_class=HTMLResponse)
 async def main(request: Request):
     return """
@@ -97,5 +85,6 @@ async def main(request: Request):
 
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(chat_ws_router)
 app.include_router(user_router)
 app.include_router(user_photo_router)
