@@ -101,7 +101,10 @@ multiplexes all chat traffic over a single connection.
   Browsers can't set custom headers on a WebSocket handshake, so the JWT
   travels as a query parameter and is decoded with the existing
   `decode_access_token`. On missing/invalid/expired token: accept then
-  immediately `close(code=4401)`.
+  immediately `close(code=4401)` — calling `close()` before `accept()`
+  makes Starlette reject the handshake with a bare HTTP 403 instead of a
+  WebSocket close frame, so accepting first is required to actually hand
+  the client a `4401` close code.
 - **Client → server** frame: `{"action": "send_message", "chat_id": int, "text": str}`.
 - **Server → client** frames:
   - `{"type": "message", "data": <MessageRead>}`

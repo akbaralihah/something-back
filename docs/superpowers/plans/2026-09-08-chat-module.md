@@ -940,12 +940,9 @@ async def chat_websocket(
     db: AsyncSession = Depends(get_db),
 ):
     user_id = decode_access_token(token)
-    if user_id is None:
-        await websocket.close(code=4401)
-        return
-
-    user = await UserRepository(db).get_by_id(user_id)
+    user = await UserRepository(db).get_by_id(user_id) if user_id is not None else None
     if user is None:
+        await websocket.accept()
         await websocket.close(code=4401)
         return
 
